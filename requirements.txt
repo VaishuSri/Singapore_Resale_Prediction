@@ -1,0 +1,8 @@
+Streamlit
+pandas 
+numpy
+scikit-learn
+pillow
+datetime
+streamlit-option-menu
+
