@@ -29,7 +29,7 @@ if selected == 'Home':
         )
 
 if selected == 'Resale_prediction':
-    df = pd.read_csv('C:/Users/RAMAN/Desktop/DS/PROJECT/Singapore_Project/Singapore.csv')
+    df = pd.read_csv('Singapore.csv.gz')
     del df['Unnamed: 0']
     print(df)
 
