@@ -1,10 +1,10 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from PIL import Image
 import pandas as pd
 from datetime import date
-import numpy as np
 from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import train_test_split
 
 # Streamlit part
 st.set_page_config(
@@ -20,18 +20,17 @@ with st.sidebar:
 
 if selected == 'Home':
     st.title("Singapore Resale Flat Prices Predicting")
-    #col1, col2 = st.columns(2)
-    # with col1:
-    #     st.image(Image.open("C:/Users/RAMAN/Desktop/DS/PROJECT/Singapore_Project/new-or-resale.jpg"), width=500)
-    # with col2:
     st.markdown(
             "The aim of this project is to create a machine learning model and implement it into an intuitive online application that forecasts Singaporean apartment prices for resale. The purpose of this predictive model is to help prospective buyers and sellers estimate the resale value of a flat. It is based on past data of resale flat transactions. Reason for Motivation: It might be difficult to determine the exact resale value of a flat in Singapore due to the fierce competition in the resale flat market. Resale values can be influenced by a wide range of variables, including location, apartment type, floor space, and length of lease. By giving customers a predicted resale price based on these variables, a predictive model can assist in overcoming these difficulties."
         )
 
 if selected == 'Resale_prediction':
-    df = pd.read_csv('Singapore.csv.gz')
+    # Read data in chunks to reduce memory usage
+    df_chunks = pd.read_csv('C:/Users/RAMAN/Desktop/DS/PROJECT/Singapore_Project/Singapore.csv', chunksize=1000)
+
+    # Concatenate chunks into one DataFrame
+    df = pd.concat(df_chunks)
     del df['Unnamed: 0']
-    print(df)
 
     # Input fields
     month = st.number_input("Month", min_value=1, max_value=12, step=1)
@@ -57,19 +56,13 @@ if selected == 'Resale_prediction':
         df[col] = le.fit_transform(df[col])
         label_encoders[col] = le
 
-    
-
-    print(df)
-
     def load_model():
         # Split the data
-        from sklearn.model_selection import train_test_split
         x = df.loc[:, df.columns != 'resale_price']
         y = df['resale_price']
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=7)
 
         # Model
-        from sklearn.tree import DecisionTreeRegressor
         model = DecisionTreeRegressor(max_depth=25)
         model.fit(x_train, y_train)
         return model
@@ -98,12 +91,10 @@ if selected == 'Resale_prediction':
             le = label_encoders[col]
             input_data[col] = le.transform(input_data[col])
 
-        print(input_data)
-
         # Making predictions
         prediction = model.predict(input_data)
-        print(prediction)
 
         # Display the prediction
         st.subheader(f"Predicted Selling Price: ${prediction[0]:,.2f}")
+
 
