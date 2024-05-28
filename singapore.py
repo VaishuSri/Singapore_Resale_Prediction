@@ -26,7 +26,7 @@ if selected == 'Home':
 
 if selected == 'Resale_prediction':
     # Read data in chunks to reduce memory usage
-    df_chunks = pd.read_csv('C:/Users/RAMAN/Desktop/DS/PROJECT/Singapore_Project/Singapore.csv', chunksize=1000)
+    df_chunks = pd.read_csv('Singapore.csv.gz', chunksize=1000)
 
     # Concatenate chunks into one DataFrame
     df = pd.concat(df_chunks)
