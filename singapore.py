@@ -25,12 +25,28 @@ if selected == 'Home':
         )
 
 if selected == 'Resale_prediction':
-    # Read data in chunks to reduce memory usage
-    df_chunks = pd.read_csv('Singapore.csv.gz', chunksize=1000)
-
-    # Concatenate chunks into one DataFrame
+    # Read data in chunks to reduce memory usage with specific data types
+    dtype_dict = {
+        'month': 'int8',
+        'year': 'int16',
+        'town': 'category',
+        'flat_type': 'category',
+        'street_name': 'category',
+        'floor_area_sqm': 'float32',
+        'flat_model': 'category',
+        'storey_start': 'int8',
+        'storey_end': 'int8',
+        'lease_commence_date': 'int16',
+        'remaining_lease_months': 'int16',
+        'resale_price': 'float32'
+    }
+    
+    df_chunks = pd.read_csv('Singapore.csv.gz', dtype=dtype_dict, chunksize=1000)
     df = pd.concat(df_chunks)
     del df['Unnamed: 0']
+    
+    # Free up memory
+    del df_chunks
 
     # Input fields
     month = st.number_input("Month", min_value=1, max_value=12, step=1)
@@ -51,24 +67,15 @@ if selected == 'Resale_prediction':
     categorical_cols = ['town', 'flat_type', 'street_name', 'flat_model']
 
     for col in categorical_cols:
-        df[col] = df[col].astype(str)
         le = LabelEncoder()
         df[col] = le.fit_transform(df[col])
         label_encoders[col] = le
 
     def load_model():
         # Split the data
-        x = df.loc[:, df.columns != 'resale_price']
+        x = df.drop('resale_price', axis=1)
         y = df['resale_price']
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=7)
-
-        #Scale
-        #Scaling is not mandatory in Decision treee algorithm, however we wil do it
-        from sklearn.preprocessing import StandardScaler
-        scaler=StandardScaler()
-        scaler.fit(x_train)
-        x_train=scaler.transform(x_train)
-        x_test=scaler.transform(x_test)
 
         # Model
         model = DecisionTreeRegressor(max_depth=25)
@@ -89,7 +96,7 @@ if selected == 'Resale_prediction':
             'floor_area_sqm': [floor_area_sqm],
             'flat_model': [flat_model],
             'storey_start': [storey_start],
-            "storey_end":[storey_end],
+            'storey_end': [storey_end],
             'lease_commence_date': [lease_commence_date],
             'remaining_lease_months': [remaining_lease_months]
         })
