@@ -32,7 +32,7 @@ if selected == 'Resale_prediction':
     df = pd.concat(df_chunks)
     del df['Unnamed: 0']
 
-    df=df.sample(50000)
+    df=df.sample(10000)
 
     # Input fields
     month = st.number_input("Month", min_value=1, max_value=12, step=1)
