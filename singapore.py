@@ -21,32 +21,59 @@ with st.sidebar:
 if selected == 'Home':
     st.title("Singapore Resale Flat Prices Predicting")
     st.markdown(
-            "The aim of this project is to create a machine learning model and implement it into an intuitive online application that forecasts Singaporean apartment prices for resale. The purpose of this predictive model is to help prospective buyers and sellers estimate the resale value of a flat. It is based on past data of resale flat transactions. Reason for Motivation: It might be difficult to determine the exact resale value of a flat in Singapore due to the fierce competition in the resale flat market. Resale values can be influenced by a wide range of variables, including location, apartment type, floor space, and length of lease. By giving customers a predicted resale price based on these variables, a predictive model can assist in overcoming these difficulties."
-        )
+        "The aim of this project is to create a machine learning model and implement it into an intuitive online application that forecasts Singaporean apartment prices for resale. The purpose of this predictive model is to help prospective buyers and sellers estimate the resale value of a flat. It is based on past data of resale flat transactions. Reason for Motivation: It might be difficult to determine the exact resale value of a flat in Singapore due to the fierce competition in the resale flat market. Resale values can be influenced by a wide range of variables, including location, apartment type, floor space, and length of lease. By giving customers a predicted resale price based on these variables, a predictive model can assist in overcoming these difficulties."
+    )
 
 if selected == 'Resale_prediction':
-    # Read data in chunks to reduce memory usage with specific data types
+    # Define data types for reading the CSV file
     dtype_dict = {
-        'month': 'int8',
-        'year': 'int16',
+        'month': 'float16',
+        'year': 'float16',
         'town': 'category',
         'flat_type': 'category',
         'street_name': 'category',
         'floor_area_sqm': 'float32',
         'flat_model': 'category',
-        'storey_start': 'int8',
-        'storey_end': 'int8',
-        'lease_commence_date': 'int16',
-        'remaining_lease_months': 'int16',
+        'storey_start': 'float16',
+        'storey_end': 'float16',
+        'lease_commence_date': 'float16',
+        'remaining_lease_months': 'float16',
         'resale_price': 'float32'
     }
-    
+
+    # Function to process each chunk
+    def process_chunk(chunk):
+        chunk.fillna({
+            'month': chunk['month'].median(),
+            'year': chunk['year'].median(),
+            'storey_start': chunk['storey_start'].median(),
+            'storey_end': chunk['storey_end'].median(),
+            'lease_commence_date': chunk['lease_commence_date'].median(),
+            'remaining_lease_months': chunk['remaining_lease_months'].median()
+        }, inplace=True)
+        
+        # Convert columns to appropriate types
+        chunk = chunk.astype({
+            'month': 'int8',
+            'year': 'int16',
+            'storey_start': 'int8',
+            'storey_end': 'int8',
+            'lease_commence_date': 'int16',
+            'remaining_lease_months': 'int16'
+        })
+        
+        return chunk
+
+    # Read and process data in chunks
     df_chunks = pd.read_csv('Singapore.csv.gz', dtype=dtype_dict, chunksize=1000)
-    df = pd.concat(df_chunks)
+    processed_chunks = [process_chunk(chunk) for chunk in df_chunks]
+
+    # Concatenate processed chunks into one DataFrame
+    df = pd.concat(processed_chunks)
     del df['Unnamed: 0']
-    
+
     # Free up memory
-    del df_chunks
+    del df_chunks, processed_chunks
 
     # Input fields
     month = st.number_input("Month", min_value=1, max_value=12, step=1)
@@ -111,3 +138,4 @@ if selected == 'Resale_prediction':
 
         # Display the prediction
         st.subheader(f"Predicted Selling Price: ${prediction[0]:,.2f}")
+
