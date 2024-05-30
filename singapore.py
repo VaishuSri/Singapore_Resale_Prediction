@@ -62,14 +62,7 @@ if selected == 'Resale_prediction':
         y = df['resale_price']
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=7)
 
-        #Scale
-        #Scaling is not mandatory in Decision treee algorithm, however we wil do it
-        from sklearn.preprocessing import StandardScaler
-        scaler=StandardScaler()
-        scaler.fit(x_train)
-        x_train=scaler.transform(x_train)
-        x_test=scaler.transform(x_test)
-
+     
         # Model
         model = DecisionTreeRegressor(max_depth=25)
         model.fit(x_train, y_train)
