@@ -27,17 +27,17 @@ if selected == 'Home':
 if selected == 'Resale_prediction':
     # Define data types for reading the CSV file
     dtype_dict = {
-        'month': 'float16',
-        'year': 'float16',
+        'month': 'float32',
+        'year': 'float32',
         'town': 'category',
         'flat_type': 'category',
         'street_name': 'category',
         'floor_area_sqm': 'float32',
         'flat_model': 'category',
-        'storey_start': 'float16',
-        'storey_end': 'float16',
-        'lease_commence_date': 'float16',
-        'remaining_lease_months': 'float16',
+        'storey_start': 'float32',
+        'storey_end': 'float32',
+        'lease_commence_date': 'float32',
+        'remaining_lease_months': 'float32',
         'resale_price': 'float32'
     }
 
@@ -138,4 +138,3 @@ if selected == 'Resale_prediction':
 
         # Display the prediction
         st.subheader(f"Predicted Selling Price: ${prediction[0]:,.2f}")
-
