@@ -5,4 +5,5 @@ scikit-learn
 pillow
 datetime
 streamlit-option-menu
+joblib
 
